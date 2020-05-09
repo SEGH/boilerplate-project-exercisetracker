@@ -98,22 +98,34 @@ app.get("/api/exercise/users", (req, res) => {
 });
 });
 
-//valid date
+//Dates
 const validDate = /(\d){4}-([0][0-9]|[1][1-2])-([0-2][0-9]|[3][0-1])/;
 
+const makeCompareFormat = (string) => {
+  let notepad = Date.parse(string);
+  let time = new Date(notepad);
+  let notes = time.toJSON();
+  let result = y.slice(0, 10);
+  return result;
+}
+let n = new Date();
+let y = n.toJSON();
+let r = y.slice(0, 10);
+//let p = String.replace(/-/g, ",");
 //I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will be the user object with also with the exercise fields added.
 app.post("/api/exercise/add", (req, res) => {
   let userId = req.body.userId;
   let description = req.body.description;
   let duration = req.body.duration;
-  let dateEntry = req.body.date.toString();
+  let dateEntry = req.body.date;
+  let dateFormat = dateEntry.replace(/-/g, ",");
   let date;
   const findAndSave = function() {
     User.findById(userId, function (err, doc) {
       if (err) {
         res.json(err);
       } else {
-          doc.exercises.push({"description": description, "duration": duration, "date": date});
+          doc.exercises.push({"description": description, "duration": parseInt(duration), "date": date});
           doc.save((err, data) => {
             if (err) {
               res.json(err);
@@ -130,24 +142,32 @@ app.post("/api/exercise/add", (req, res) => {
   } else {
       if (req.body.date == "") {
         let n = new Date();
-        let y = n.toJSON();
-        date = y.slice(0,10);
+        date = n.toDateString();
         findAndSave();
-    } else if (validDate.test(dateEntry) === false) {
+    } /*else if (validDate.test(dateEntry) === false) {
         console.log(dateEntry);
         res.json("Invalid Date");
-    } else {
-        date = dateEntry;
+    }*/ else {
+        let result = new Date(dateFormat);
+        date = result.toDateString();
         findAndSave();
     }
   };
 });
 
+const makeTime = (string) => {
+  let notepad = string.replace(/-/g, ",");
+  let notes = new Date(notepad);
+  let result = notes.toDateString();
+  return result;
+};
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
 app.get("/api/exercise/log", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
+  //const fromDate = Date.parse(from);
   const to = req.query.to;
+  //const toDate = Date.parse(to);
   const limit = Number(req.query.limit);
   User.find({"_id": user}, (err, data) => {
     if (err) {
@@ -157,17 +177,17 @@ app.get("/api/exercise/log", (req, res) => {
       let result;
       if (from != null && to != null) {
         result = exercises.filter((x) => {
-        return x["date"] >= from && x["date"] <= to;
+        let thisDate = makeCompareFormat(x["date"]);
+        return thisDate >= from && thisDate <= to;
         });
       } else if (from != null && to == null) {
         let n = new Date();
-        let y = n.toJSON();
-        let today = y.slice(0, 10);
+        let today = makeCompareFormat(n);
         result = exercises.filter((x) => {
-          return x["date"] >= from && x["date"] <= today;
+          let thisDate = makeCompareFormat(x["date"]);
+          return thisDate >= from && thisDate <= today;
         });
       } else if (from == null) {
-        let count = exercises.length;
         result = exercises;
       }
       if (limit) {
@@ -181,7 +201,13 @@ app.get("/api/exercise/log", (req, res) => {
 })
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 /*
-User.deleteMany({"username": "fcc_test_15890450443"}, (err) => {
+User.deleteMany({"username": "fcc_test_15890540082"}, (err) => {
 if (err) return err;
 })
 */
+//console.log(new Date("2020-05-02"));
+
+//console.log(Date.parse("Sat May 09 2020"));
+//console.log(Date.parse("2020-09-05"));
+//console.log(makeCompareFormat("Sat May 09 2020"));
+//console.log(makeTime("2020-09-05"));
