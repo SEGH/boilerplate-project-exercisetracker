@@ -97,36 +97,52 @@ app.get("/api/exercise/users", (req, res) => {
   }
 });
 });
+
+//valid date
+const validDate = /(\d){4}-([0][0-9]|[1][1-2])-([0-2][0-9]|[3][0-1])/;
+
 //I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will be the user object with also with the exercise fields added.
 app.post("/api/exercise/add", (req, res) => {
   let userId = req.body.userId;
   let description = req.body.description;
   let duration = req.body.duration;
+  let dateEntry = req.body.date.toString();
   let date;
-  if (req.body.date == "") {
-      let n = new Date();
-      let y = n.toJSON();
-      date = y.slice(0,10);
-    } else {
-      let d = req.body.date;
-      let newd = d.toJSON();
-      date = newd.slice(0, 10);
+  const findAndSave = function() {
+    User.findById(userId, function (err, doc) {
+      if (err) {
+        res.json(err);
+      } else {
+          doc.exercises.push({"description": description, "duration": duration, "date": date});
+          doc.save((err, data) => {
+            if (err) {
+              res.json(err);
+            } else {
+                res.json(doc);
+            }
+          });
+      }
+    });
   };
-  User.findById(userId, function (err, doc) {
-    if (err) {
-      res.json(err);
+  
+  if (!description || !duration || !userId) {
+    res.json("Invalid Entry");
+  } else {
+      if (req.body.date == "") {
+        let n = new Date();
+        let y = n.toJSON();
+        date = y.slice(0,10);
+        findAndSave();
+    } else if (validDate.test(dateEntry) === false) {
+        console.log(dateEntry);
+        res.json("Invalid Date");
     } else {
-      doc.exercises.push({"description": description, "duration": duration, "date": date});
-      doc.save((err, data) => {
-        if (err) {
-          res.json(err);
-        } else {
-          res.json(doc);
-        }
-      });
+        date = dateEntry;
+        findAndSave();
     }
-  });
+  };
 });
+
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
 app.get("/api/exercise/log", (req, res) => {
   const user = req.query.userId;
