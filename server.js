@@ -130,7 +130,7 @@ app.post("/api/exercise/add", (req, res) => {
             if (err) {
               res.json(err);
             } else {
-                res.json(doc);
+                res.json(doc.exercises);
             }
           });
       }
@@ -201,7 +201,7 @@ app.get("/api/exercise/log", (req, res) => {
 })
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 /*
-User.deleteMany({"username": "fcc_test_15890540082"}, (err) => {
+User.deleteMany({"username": "fcc_test_15890623594"}, (err) => {
 if (err) return err;
 })
 */
