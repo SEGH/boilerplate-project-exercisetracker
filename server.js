@@ -125,7 +125,7 @@ app.post("/api/exercise/add", (req, res) => {
       if (err) {
         res.json(err);
       } else {
-          doc.exercises.push({"description": description, "duration": parseInt(duration), "date": date});
+          doc.exercises.push({"username": "","description": description, "duration": parseInt(duration), "_id": "", "date": date});
           doc.save((err, data) => {
             if (err) {
               res.json(err);
