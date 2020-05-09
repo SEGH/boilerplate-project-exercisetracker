@@ -108,7 +108,9 @@ app.post("/api/exercise/add", (req, res) => {
       let y = n.toJSON();
       date = y.slice(0,10);
     } else {
-      date = req.body.date;
+      let d = req.body.date;
+      let newd = d.toJSON();
+      date = newd.slice(0, 10);
   };
   User.findById(userId, function (err, doc) {
     if (err) {
@@ -162,3 +164,8 @@ app.get("/api/exercise/log", (req, res) => {
   });
 })
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
+/*
+User.deleteMany({"username": "fcc_test_15890450443"}, (err) => {
+if (err) return err;
+})
+*/
