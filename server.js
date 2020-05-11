@@ -175,6 +175,21 @@ const makeTime = (string) => {
   return result;
 };
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
+app.get("/api/exercise/log/:userId?", (req, res) => {
+  const userParam = req.params.userId;
+  User.find({"_id": userParam}, (err, data) => {
+    if (err) {
+      res.json(err);
+    } else {
+      let exercises = data[0]["log"];
+      let count = exercises.length;
+      let result = {"username": data[0]["username"], "_id": userParam, "log": exercises, "count": count};
+      res.json(result);
+    }
+  })
+});
+
+
 app.get("/api/exercise/log", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
@@ -216,7 +231,7 @@ app.get("/api/exercise/log", (req, res) => {
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 let test = /[fcc_test_]\d+/;
 /*
-User.deleteMany({"username": "SEGH"}, (err) => {
+User.deleteMany({"username": test}, (err) => {
 if (err) return err;
 });
 */
