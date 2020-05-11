@@ -167,14 +167,17 @@ app.post("/api/exercise/add", (req, res) => {
       }       
   }
 });
-
+/*
 const makeTime = (string) => {
   let notepad = string.replace(/-/g, ",");
   let notes = new Date(notepad);
   let result = notes.toDateString();
   return result;
 };
+*/
+
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
+/*
 app.get("/api/exercise/log/:userId?", (req, res) => {
   const userParam = req.params.userId;
   User.find({"_id": userParam}, (err, data) => {
@@ -188,15 +191,16 @@ app.get("/api/exercise/log/:userId?", (req, res) => {
     }
   })
 });
+*/
 
-
-app.get("/api/exercise/log", (req, res) => {
+app.get("/api/exercise/log/", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
   //const fromDate = Date.parse(from);
   const to = req.query.to;
   //const toDate = Date.parse(to);
   const limit = Number(req.query.limit);
+  if (user) {
   User.find({"_id": user}, (err, data) => {
     if (err) {
       res.json(err);
@@ -220,14 +224,15 @@ app.get("/api/exercise/log", (req, res) => {
         result = {"username": data[0]["username"], "_id": user, "log": exercises, "count": count};
       }
       if (limit) {
-        let limited = result.slice(0, limit);
+        let limited = result["log"].slice(0, limit);
         res.json(limited);
       } else {
         res.json(result);
       }  
     }
   });
-})
+  }
+});
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 let test = /[fcc_test_]\d+/;
 /*
