@@ -145,7 +145,7 @@ app.post("/api/exercise/add", (req, res) => {
     } /*else if (validDate.test(dateEntry) === false) {
         console.log(dateEntry);
         res.json("Invalid Date");
-    }*/ else {
+    }*/ else if (req.body.date != undefined) {
           let dateEntry = req.body.date;
           let dateFormat = dateEntry.replace(/-/g, ",");
           let result = new Date(dateFormat);
@@ -200,8 +200,9 @@ app.get("/api/exercise/log", (req, res) => {
   });
 })
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
+let test = /[fcc_test_]\d+/;
 /*
-User.deleteMany({"username": "fcc_test_15890623594"}, (err) => {
+User.deleteMany({"username": test}, (err) => {
 if (err) return err;
 })
 */
