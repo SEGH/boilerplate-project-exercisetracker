@@ -202,7 +202,7 @@ app.get("/api/exercise/log", (req, res) => {
           return thisDate >= from && thisDate <= today;
         });
       } else if (from == null) {
-        result = {"_id": user, "log": exercises, "count": count};
+        result = {"username": data[0]["username"], "_id": user, "log": exercises, "count": count};
       }
       if (limit) {
         let limited = result.slice(0, limit);
