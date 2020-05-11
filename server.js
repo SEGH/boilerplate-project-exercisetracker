@@ -117,8 +117,6 @@ app.post("/api/exercise/add", (req, res) => {
   let userId = req.body.userId;
   let description = req.body.description;
   let duration = req.body.duration;
-  let dateEntry = req.body.date;
-  let dateFormat = dateEntry.replace(/-/g, ",");
   let date;
   const findAndSave = function() {
     User.findById(userId, function (err, doc) {
@@ -148,10 +146,12 @@ app.post("/api/exercise/add", (req, res) => {
         console.log(dateEntry);
         res.json("Invalid Date");
     }*/ else {
-        let result = new Date(dateFormat);
-        date = result.toDateString();
-        findAndSave();
-    }
+          let dateEntry = req.body.date;
+          let dateFormat = dateEntry.replace(/-/g, ",");
+          let result = new Date(dateFormat);
+          date = result.toDateString();
+          findAndSave();
+        }
   };
 });
 
