@@ -153,19 +153,21 @@ app.post("/api/exercise/add", (req, res) => {
   
   if (!description || !duration || !userId) {
     res.json("Invalid Entry");
-  } else {
-      if (req.body.date == "" || !date || date == undefined) {
+  } else if (req.body.date == "") {
         let n = new Date();
         date = n.toDateString();
         findAndSave();
-    } else {
-          let dateEntry = req.body.date;
-          let dateFormat = dateEntry.replace(/-/g, ",");
-          let result = new Date(dateFormat);
-          date = result.toDateString();
-          findAndSave();
-      }
-  };
+  } else {
+      let dateEntry = req.body.date;
+      let dateFormat = dateEntry.replace(/-/g, ",");
+      let result = new Date(dateFormat);
+      date = result.toDateString();
+      if (date == "Invalid Date") {
+        res.json("Invalid Date");
+      } else {
+        findAndSave();
+      }       
+  }
 });
 
 const makeTime = (string) => {
@@ -215,9 +217,9 @@ app.get("/api/exercise/log", (req, res) => {
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 let test = /[fcc_test_]\d+/;
 /*
-User.deleteMany({"username": test}, (err) => {
+User.deleteMany({"username": "SEGH"}, (err) => {
 if (err) return err;
-})
+});
 */
 //console.log(new Date("2020-05-02"));
 
