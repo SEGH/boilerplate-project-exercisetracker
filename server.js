@@ -55,10 +55,18 @@ app.get("/api/hello", function (req, res) {
 
 //Schemas
 const Schema = mongoose.Schema;
+/*
+const exerciseSchema = new Schema({
+  "description": {type: String, required: true},
+  "duration": {type: Number, required: true},
+  "date": {type: String}
+});
+const Exercise = mongoose.model('Exercise', exerciseSchema);
+*/
 const userSchema = new Schema({
   "username": {type: String, required: true},
   "_id": {type: String, required: true},
-  "exercises": []
+  "log": []
 });
 const User = mongoose.model('User', userSchema);
 
@@ -112,23 +120,31 @@ let n = new Date();
 let y = n.toJSON();
 let r = y.slice(0, 10);
 //let p = String.replace(/-/g, ",");
+
 //I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will be the user object with also with the exercise fields added.
 app.post("/api/exercise/add", (req, res) => {
   let userId = req.body.userId;
   let description = req.body.description;
-  let duration = req.body.duration;
+  let duration = parseInt(req.body.duration);
   let date;
   const findAndSave = function() {
     User.findById(userId, function (err, doc) {
       if (err) {
         res.json(err);
       } else {
-          doc.exercises.push({"description": description, "duration": parseInt(duration), "date": date});
+          doc.log.push({"description": description, "duration": duration, "date": date});
           doc.save((err, data) => {
             if (err) {
               res.json(err);
             } else {
-                res.json(data);
+              let output = {
+                "username": doc.username,
+                "description": description,
+                "duration": duration,
+                "_id": doc._id,
+                "date": date
+              };
+                res.json(output);
             }
           });
       }
@@ -142,16 +158,13 @@ app.post("/api/exercise/add", (req, res) => {
         let n = new Date();
         date = n.toDateString();
         findAndSave();
-    } /*else if (validDate.test(dateEntry) === false) {
-        console.log(dateEntry);
-        res.json("Invalid Date");
-    }*/ else {
+    } else {
           let dateEntry = req.body.date;
           let dateFormat = dateEntry.replace(/-/g, ",");
           let result = new Date(dateFormat);
           date = result.toDateString();
           findAndSave();
-        }
+      }
   };
 });
 
@@ -173,7 +186,7 @@ app.get("/api/exercise/log", (req, res) => {
     if (err) {
       res.json(err);
     } else {
-      let exercises = data[0]["exercises"];
+      let exercises = data[0]["log"];
       let result;
       if (from != null && to != null) {
         result = exercises.filter((x) => {
