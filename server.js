@@ -158,9 +158,7 @@ app.post("/api/exercise/add", (req, res) => {
         date = n.toDateString();
         findAndSave();
   } else {
-      let dateEntry = req.body.date;
-      let dateFormat = dateEntry.replace(/-/g, ",");
-      let result = new Date(dateFormat);
+      let result = new Date(req.body.date);
       date = result.toDateString();
       if (date == "Invalid Date") {
         res.json("Invalid Date");
@@ -189,6 +187,7 @@ app.get("/api/exercise/log", (req, res) => {
       res.json(err);
     } else {
       let exercises = data[0]["log"];
+      let count = exercises.length;
       let result;
       if (from != null && to != null) {
         result = exercises.filter((x) => {
@@ -203,7 +202,7 @@ app.get("/api/exercise/log", (req, res) => {
           return thisDate >= from && thisDate <= today;
         });
       } else if (from == null) {
-        result = exercises;
+        result = {"_id": user, "log": exercises, "count": count};
       }
       if (limit) {
         let limited = result.slice(0, limit);
