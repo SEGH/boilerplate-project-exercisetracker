@@ -128,7 +128,7 @@ app.post("/api/exercise/add", (req, res) => {
             if (err) {
               res.json(err);
             } else {
-                res.json(doc);
+                res.json(data);
             }
           });
       }
@@ -138,14 +138,14 @@ app.post("/api/exercise/add", (req, res) => {
   if (!description || !duration || !userId) {
     res.json("Invalid Entry");
   } else {
-      if (req.body.date == "") {
+      if (req.body.date == "" || !date || date == undefined) {
         let n = new Date();
         date = n.toDateString();
         findAndSave();
     } /*else if (validDate.test(dateEntry) === false) {
         console.log(dateEntry);
         res.json("Invalid Date");
-    }*/ else if (req.body.date != undefined) {
+    }*/ else {
           let dateEntry = req.body.date;
           let dateFormat = dateEntry.replace(/-/g, ",");
           let result = new Date(dateFormat);
