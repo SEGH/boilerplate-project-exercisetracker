@@ -55,14 +55,6 @@ app.get("/api/hello", function (req, res) {
 
 //Schemas
 const Schema = mongoose.Schema;
-/*
-const exerciseSchema = new Schema({
-  "description": {type: String, required: true},
-  "duration": {type: Number, required: true},
-  "date": {type: String}
-});
-const Exercise = mongoose.model('Exercise', exerciseSchema);
-*/
 const userSchema = new Schema({
   "username": {type: String, required: true},
   "_id": {type: String, required: true},
@@ -107,19 +99,15 @@ app.get("/api/exercise/users", (req, res) => {
 });
 
 //Dates
-const validDate = /(\d){4}-([0][0-9]|[1][1-2])-([0-2][0-9]|[3][0-1])/;
+//const validDate = /(\d){4}-([0][0-9]|[1][1-2])-([0-2][0-9]|[3][0-1])/;
 
 const makeCompareFormat = (string) => {
   let notepad = Date.parse(string);
   let time = new Date(notepad);
   let notes = time.toJSON();
-  let result = y.slice(0, 10);
+  let result = notes.slice(0, 10);
   return result;
 }
-let n = new Date();
-let y = n.toJSON();
-let r = y.slice(0, 10);
-//let p = String.replace(/-/g, ",");
 
 //I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will be the user object with also with the exercise fields added.
 app.post("/api/exercise/add", (req, res) => {
