@@ -167,14 +167,7 @@ app.post("/api/exercise/add", (req, res) => {
       }       
   }
 });
-/*
-const makeTime = (string) => {
-  let notepad = string.replace(/-/g, ",");
-  let notes = new Date(notepad);
-  let result = notes.toDateString();
-  return result;
-};
-*/
+
 
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
 /*
