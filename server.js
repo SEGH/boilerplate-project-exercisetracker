@@ -142,13 +142,49 @@ app.post("/api/exercise/add", (req, res) => {
 
 
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
-
+app.get("/api/exercise/log?", (req, res) => {
+  const user = req.query.userId;
+  
+  if (user) {
+    User.findById(user, (err, data) => {
+      if (err) {
+        res.json(err);
+      } else {
+        let logEntries = data.log;
+        
+        if (req.query.from && req.query.to) {
+          console.log(req.query.from, req.query.to);
+          const fromDate = Date.parse(req.query.from);
+          const toDate = Date.parse(req.query.to);
+          let filteredDates = data.log.filter((x) => {
+            let thisDate = Date.parse(x.date);
+            return thisDate >= fromDate && thisDate <= toDate;
+          });
+          logEntries = filteredDates;
+        }
+        if (req.query.limit && req.query.limit < data.log.length) {
+          console.log(req.query.limit);
+          let limited = logEntries.slice(0, req.query.limit);
+          logEntries = limited;
+        }
+        let result = {
+          "username": data.username,
+          "_id": data._id,
+          "log": logEntries,
+          "count": data.log.length
+        };
+        res.json(result);
+      }
+    })
+  }
+});
+/*
 app.get("/api/exercise/log?", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
   const to = req.query.to;
   const limit = Number(req.query.limit);
-
+  console.log(user);
   if (user) {
    User.find({"_id": user}, (err, data) => {
     if (err) {
@@ -195,6 +231,7 @@ app.get("/api/exercise/log?", (req, res) => {
     });
   }
 });
+*/
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 let test = /[fcc_test_]\d+/;
 /*
