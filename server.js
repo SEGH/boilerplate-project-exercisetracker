@@ -178,60 +178,7 @@ app.get("/api/exercise/log?", (req, res) => {
     })
   }
 });
-/*
-app.get("/api/exercise/log?", (req, res) => {
-  const user = req.query.userId;
-  const from = req.query.from;
-  const to = req.query.to;
-  const limit = Number(req.query.limit);
-  console.log(user);
-  if (user) {
-   User.find({"_id": user}, (err, data) => {
-    if (err) {
-      res.json(err);
-    } else {
-      let exercises = data[0]["log"];
-      let count = exercises.length;
-      let result;
 
-      if (!from || !to) {
-        result = {
-          "username": data[0]["username"],
-          "_id": user,
-          "log": exercises,
-          "count": count
-        };
-        if (limit) {
-          let limited = result["log"].slice(0, limit);
-          result = {
-            "username": data[0]["username"],
-            "id": user,
-            "log": limited,
-            "count": count
-          }
-          res.json(result);
-        } else {
-          res.json(result);
-        }
-      } else {
-          let fromDate = Date.parse(from);
-          let toDate = Date.parse(to);
-        
-          if (fromDate != NaN && toDate != NaN) {
-            result = exercises.filter((x) => {
-              let thisDate = Date.parse(x["date"]);
-              return thisDate >= fromDate && thisDate <= toDate;
-              });
-            res.json(result);
-          } else {
-              res.json("Invalid Date");
-          }
-        }
-      }
-    });
-  }
-});
-*/
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 let test = /[fcc_test_]\d+/;
 /*
