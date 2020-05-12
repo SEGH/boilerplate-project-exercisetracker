@@ -174,7 +174,7 @@ app.get("/api/exercise/log/:userId?", (req, res) => {
 });
 */
 
-app.get("/api/exercise/log/", (req, res) => {
+app.get("/api/exercise/log?", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
   //const fromDate = Date.parse(from);
