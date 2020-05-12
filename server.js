@@ -145,14 +145,12 @@ app.post("/api/exercise/add", (req, res) => {
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 app.get("/api/exercise/log?", (req, res) => {
   const user = req.query.userId;
-  
-  if (user) {
+  if (user && user != undefined) {
     User.findById(user, (err, data) => {
       if (err) {
         res.json(err);
       } else {
         let logEntries = data.log;
-        console.log(logEntries);
         if (req.query.from && req.query.to) {
           const fromDate = Date.parse(req.query.from);
           const toDate = Date.parse(req.query.to);
@@ -175,6 +173,8 @@ app.get("/api/exercise/log?", (req, res) => {
         res.json(result);
       }
     })
+  } else {
+    res.json("Invalid ID");
   }
 });
 
