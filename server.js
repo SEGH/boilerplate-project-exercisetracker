@@ -174,7 +174,7 @@ app.get("/api/exercise/log/:userId?", (req, res) => {
 });
 */
 
-app.get("/api/exercise/log?", (req, res) => {
+app.get("/api/exercise/log?", async (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
   //const fromDate = Date.parse(from);
@@ -182,7 +182,7 @@ app.get("/api/exercise/log?", (req, res) => {
   //const toDate = Date.parse(to);
   const limit = Number(req.query.limit);
   if (user) {
-  User.find({"_id": user}, (err, data) => {
+  await User.find({"_id": user}, (err, data) => {
     if (err) {
       res.json(err);
     } else {
