@@ -17,12 +17,7 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
-/*
-// Not found middleware
-app.use((req, res, next) => {
-  return next({status: 404, message: 'not found'})
-})
-*/
+
 // Error Handling middleware
 app.use((err, req, res, next) => {
   let errCode, errMessage
@@ -98,17 +93,6 @@ app.get("/api/exercise/users", (req, res) => {
 });
 });
 
-//Dates
-//const validDate = /(\d){4}-([0][0-9]|[1][1-2])-([0-2][0-9]|[3][0-1])/;
-
-const makeCompareFormat = (string) => {
-  let notepad = Date.parse(string);
-  let time = new Date(notepad);
-  let notes = time.toJSON();
-  let result = notes.slice(0, 10);
-  return result;
-}
-
 //I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will be the user object with also with the exercise fields added.
 app.post("/api/exercise/add", (req, res) => {
   let userId = req.body.userId;
@@ -158,60 +142,52 @@ app.post("/api/exercise/add", (req, res) => {
 
 
 //I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
-/*
-app.get("/api/exercise/log/:userId?", (req, res) => {
-  const userParam = req.params.userId;
-  User.find({"_id": userParam}, (err, data) => {
-    if (err) {
-      res.json(err);
-    } else {
-      let exercises = data[0]["log"];
-      let count = exercises.length;
-      let result = {"username": data[0]["username"], "_id": userParam, "log": exercises, "count": count};
-      res.json(result);
-    }
-  })
-});
-*/
 
-app.get("/api/exercise/log?", async (req, res) => {
+app.get("/api/exercise/log?", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
   //const fromDate = Date.parse(from);
   const to = req.query.to;
   //const toDate = Date.parse(to);
   const limit = Number(req.query.limit);
+
   if (user) {
-  await User.find({"_id": user}, (err, data) => {
+   User.find({"_id": user}, (err, data) => {
     if (err) {
-      res.json(err);
+      res.json("User Not Found");
     } else {
       let exercises = data[0]["log"];
       let count = exercises.length;
       let result;
-      if (from != null && to != null) {
-        result = exercises.filter((x) => {
-        let thisDate = makeCompareFormat(x["date"]);
-        return thisDate >= from && thisDate <= to;
-        });
-      } else if (from != null && to == null) {
-        let n = new Date();
-        let today = makeCompareFormat(n);
-        result = exercises.filter((x) => {
-          let thisDate = makeCompareFormat(x["date"]);
-          return thisDate >= from && thisDate <= today;
-        });
-      } else if (from == null) {
-        result = {"username": data[0]["username"], "_id": user, "log": exercises, "count": count};
+
+      if (!from || !to) {
+        result = {
+          "username": data[0]["username"],
+          "_id": user,
+          "log": exercises,
+          "count": count
+        };
+      } else {
+          let fromDate = Date.parse(from);
+          let toDate = Date.parse(to);
+        
+          if (fromDate != NaN && toDate != NaN) {
+            result = exercises.filter((x) => {
+              let thisDate = Date.parse(x["date"]);
+              return thisDate >= fromDate && thisDate <= toDate;
+            });
+          } else {
+              res.json("Invalid Date");
+          }
       }
       if (limit) {
         let limited = result["log"].slice(0, limit);
         res.json(limited);
       } else {
         res.json(result);
-      }  
-    }
-  });
+      }
+      }
+    });
   }
 });
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
@@ -221,9 +197,8 @@ User.deleteMany({"username": test}, (err) => {
 if (err) return err;
 });
 */
-//console.log(new Date("2020-05-02"));
 
-//console.log(Date.parse("Sat May 09 2020"));
-//console.log(Date.parse("2020-09-05"));
-//console.log(makeCompareFormat("Sat May 09 2020"));
-//console.log(makeTime("2020-09-05"));
+// Not found middleware
+app.use((req, res, next) => {
+  return next({status: 404, message: 'not found'})
+})
