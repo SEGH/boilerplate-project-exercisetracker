@@ -125,7 +125,7 @@ app.post("/api/exercise/add", (req, res) => {
   
   if (!description || !duration || !userId) {
     res.json("Invalid Entry");
-  } else if (req.body.date == "") {
+  } else if (!date || req.body.date == "") {
         let n = new Date();
         date = n.toDateString();
         findAndSave();
@@ -145,11 +145,12 @@ app.post("/api/exercise/add", (req, res) => {
 //I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int) 
 app.get("/api/exercise/log?", (req, res) => {
   const user = req.query.userId;
-  if (user && user != undefined) {
+  console.log(user);
+  if (user) {
     User.findById(user, (err, data) => {
       if (err) {
         res.json(err);
-      } else {
+      } else if (data != null) {
         let logEntries = data.log;
         if (req.query.from && req.query.to) {
           const fromDate = Date.parse(req.query.from);
@@ -165,15 +166,17 @@ app.get("/api/exercise/log?", (req, res) => {
           logEntries = limited;
         }
         let result = {
-          "username": data.username,
           "_id": data._id,
-          "log": logEntries,
-          "count": data.log.length
+          "username": data.username,
+          "count": data.log.length,
+          "log": logEntries
         };
+        console.log(result);
         res.json(result);
       }
     })
   } else {
+    console.log("invalid");
     res.json("Invalid ID");
   }
 });
@@ -184,8 +187,7 @@ User.deleteMany({"username": test}, (err) => {
 if (err) return err;
 });
 */
-/*
 // Not found middleware
 app.use((req, res, next) => {
-  return next({status: 404, message: 'not found'})
-})*/
+  return ({status: 404, message: 'not found'})
+})
