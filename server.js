@@ -146,15 +146,13 @@ app.post("/api/exercise/add", (req, res) => {
 app.get("/api/exercise/log?", (req, res) => {
   const user = req.query.userId;
   const from = req.query.from;
-  //const fromDate = Date.parse(from);
   const to = req.query.to;
-  //const toDate = Date.parse(to);
   const limit = Number(req.query.limit);
 
   if (user) {
    User.find({"_id": user}, (err, data) => {
     if (err) {
-      res.json("User Not Found");
+      res.json(err);
     } else {
       let exercises = data[0]["log"];
       let count = exercises.length;
@@ -167,6 +165,18 @@ app.get("/api/exercise/log?", (req, res) => {
           "log": exercises,
           "count": count
         };
+        if (limit) {
+          let limited = result["log"].slice(0, limit);
+          result = {
+            "username": data[0]["username"],
+            "id": user,
+            "log": limited,
+            "count": count
+          }
+          res.json(result);
+        } else {
+          res.json(result);
+        }
       } else {
           let fromDate = Date.parse(from);
           let toDate = Date.parse(to);
@@ -175,17 +185,12 @@ app.get("/api/exercise/log?", (req, res) => {
             result = exercises.filter((x) => {
               let thisDate = Date.parse(x["date"]);
               return thisDate >= fromDate && thisDate <= toDate;
-            });
+              });
+            res.json(result);
           } else {
               res.json("Invalid Date");
           }
-      }
-      if (limit) {
-        let limited = result["log"].slice(0, limit);
-        res.json(limited);
-      } else {
-        res.json(result);
-      }
+        }
       }
     });
   }
@@ -197,8 +202,8 @@ User.deleteMany({"username": test}, (err) => {
 if (err) return err;
 });
 */
-
+/*
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'not found'})
-})
+})*/
