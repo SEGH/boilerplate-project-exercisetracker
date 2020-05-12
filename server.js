@@ -125,7 +125,7 @@ app.post("/api/exercise/add", (req, res) => {
   
   if (!description || !duration || !userId) {
     res.json("Invalid Entry");
-  } else if (!date || req.body.date == "") {
+  } else if (!req.body.date || req.body.date == "") {
         let n = new Date();
         date = n.toDateString();
         findAndSave();
